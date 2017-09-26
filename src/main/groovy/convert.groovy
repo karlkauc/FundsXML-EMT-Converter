@@ -1,40 +1,59 @@
-import static com.xlson.groovycsv.CsvParser.parseCsv
+import com.xlson.groovycsv.CsvParser
+import groovy.xml.MarkupBuilder
+import groovy.xml.XmlUtil
+import java.util.logging.Logger
 
-println "hallo welt 2222!!!"
+def originDir = new File("C:\\Data\\src\\FundsXML\\documents\\2017-09-19_EMT_Converter\\emt")
+def xmlDataSuppliere = "ESK"
+def xmlContentDate = new Date().format('YYYY-MM-dd')
 
-def csv = '''Name,Lastname
-Mark,Andersson
-Pete,Hansen'''
+Logger log = Logger.getLogger("")
 
-def data = parseCsv(csv)
-for (line in data) {
-    println "$line.Name $line.Lastname"
+
+originDir.eachFile { file ->
+    if (file.name.toLowerCase().endsWith(".csv")) {
+        log.info("processing file: " + file.toPath())
+        println xmlContentDate
+
+        def csv = new CsvParser().parse(file.text, separator: ';', quoteChar: "'")
+
+        csv.each { line ->
+            def writer = new StringWriter()
+            def fXML = new MarkupBuilder(writer)
+
+            fXML.FundsXML4(["xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation": "https://fdp-service.oekb.at/FundsXML_4.0.1_AI.xsd"]) {
+                ControlData {
+                    UniqueDocumentID(new Date())
+                    DocumentGenerated(new Date())
+                    Version("4.1.0")
+                    ContentDate(xmlContentDate)
+                    DataSupplier {
+                        SystemCountry('AT')
+                        Short(xmlDataSuppliere)
+                        Name(xmlDataSuppliere)
+                        Type('company')
+                    }
+                }
+                RegulatoryReportings {
+                    DirectReporting {
+                        EMT {
+                            FinancialInstrument {
+                                FundOrShareClassIdentifiers {
+                                    ISINs {
+                                        ISIN(line.ISIN)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            println "LINE:  " + line
+            println XmlUtil.serialize(writer.toString())
+        }
+    }
+    else {
+        log.info(file.toPath().toString() + " ignoring... not a CSV file.")
+    }
+
 }
-
-def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-1.0.jar [options]')
-cli.with {
-    h longOpt: 'help',              'Show this screen'
-    i longOpt: 'InputFileOrDir',    args: 1, argName: 'InputFileOrDir', 'CSV file or directory with CSV files'
-
-    c longOpt: 'concurrency',       args: 1, argName: 'concurrency', 'number of processes sending messages'
-    n longOpt: 'messages',          args: 1, argName: 'messages', 'number of messages to be send by each process'
-    s longOpt: 'ip:port',           args: 2, argName: 'ip:port', 'server IP address:server port', valueSeparator: ':'
-}
-
-def options = cli.parse(args)
-println options.t
-println options.c
-println options.n
-println options.ss
-
-// convert
-// -i --InputFileOrDir - CSV file or directory of CSV files to convert (default current dir)
-// -o --OutputDir - directory for converted FundsXML files (default current directory)
-// -s --seperator CSV Delimiter. (default ',')
-// -p --DataSupplier  - FundsXML Datasupplier (default 'XXX')
-// -c --ContentDate ContentDate (default current date)
-// -d --debug print debug information (default off)
-
-
-
-
