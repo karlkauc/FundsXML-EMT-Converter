@@ -22,15 +22,16 @@ Open a command line client and type "gradle fatJar"
 The compiled converter can be started with "java -jar build\libs\FundsXML-EMT-Converter-all-0.1.jar" 
 
 ##start converting
-Parameter:  
+
+Parameter: sdfg   
+  
 ###input
-asdf
+asdf  
+
 ###output
-asfd
+asfd  
 ###asfd
 
 
-
- 
 #License
 Apache 2 license...
