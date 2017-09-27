@@ -1,5 +1,7 @@
 # FundsXML-EMT-Converter
 
+[![Apache 2.0 License](https://img.shields.io/badge/LICENSE-Apache_2.0-yellow.svg)][license]
+
 ## Purpose
 The following tool convertes a EMT (CSV file) to an FundsXML4 file.
 

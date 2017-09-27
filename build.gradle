@@ -12,9 +12,9 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.12'
-    compile group: 'com.xlson.groovycsv', name: 'groovycsv', version: '1.1'
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.12'
+    // compile group: 'com.xlson.groovycsv', name: 'groovycsv', version: '1.1'
+    // compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 }
 
 task fatJar(type: Jar) {
