@@ -23,13 +23,14 @@ originDir.eachFile { file ->
                 return
 
             def split = line.split(';')
+            println "groesse: " + split.size()
 
             def uniqueDocumentId = xmlDataSuppliere + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
             def isin = split.getAt(0)
 
             // General Financial Instrument information
-            def Financial_Instrument_Identifying_Data = split.getAt(0)
-            def Type_Of_Identification_Code_For_The_Financial_Instrument = split.getAt(1)
+            def Financial_Instrument_Identifying_Data = split[0]
+            def Type_Of_Identification_Code_For_The_Financial_Instrument = split[1]
             def Financial_Instrument_Name = split.getAt(2)
             def Financial_Instrument_Currency = split?.getAt(3)
             def Reporting_Date = split?.getAt(4)
@@ -136,7 +137,7 @@ originDir.eachFile { file ->
                             FinancialInstrument {
                                 FundOrShareClassIdentifiers {
                                     ISINs {
-                                        ISIN(isin)
+                                        ISIN(split[0])
                                     }
                                 }
                             }
