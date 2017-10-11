@@ -9,7 +9,7 @@ The following tool convertes a EMT (CSV file) to an FundsXML4 file.
 
 
 ### precompiled binary files
-You can download a precompiled jar file [here](https://github.com/karlkauc/FundsXML-EMT-Converter/blob/master/documents/FundsXML-EMT-Converter-all-0.1.jar) !  
+You can download a precompiled jar file [here](https://github.com/karlkauc/FundsXML-EMT-Converter/raw/master/documents/FundsXML-EMT-Converter-all-0.1.jar) !  
 
 ### build from source
 To build the converter from source you need:
