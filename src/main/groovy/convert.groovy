@@ -11,25 +11,54 @@ def xmlDataSuppliereShort = "ESK"
 def xmlDataSuppliereName = "ESPA"
 def xmlDataSuppliereType = 'IC'
 Calendar today = Calendar.getInstance();
-
 Logger log = Logger.getLogger("")
 
+def lineStart = 1
+def splitter = ';'
+
+
+// generate random String for uniqueness
 def generator = { String alphabet, int n ->
     new Random().with {
         (1..n).collect { alphabet[nextInt(alphabet.length())] }.join()
     }
 }
 
+// detecting split character
+def static getSplitter(String s) {
+    def map = [:]
+    def possibleSplitter = [';', ',', '|']
+
+    s.toCharArray().each { c ->
+        if (map.containsKey(c)) {
+            map.put(c, map[c] + 1)
+        } else {
+            map.put(c, 1)
+        }
+    }
+
+    return map.findAll { k, v -> possibleSplitter.contains(k.toString()) }.sort { e1, e2 ->
+        e2.value <=> e1.value
+    }.keySet().toArray()[0].toString()
+}
+
 originDir.eachFile { file ->
     if (file.name.toLowerCase().endsWith(".csv")) {
         log.info("processing file: " + file.toPath())
+        splitter = getSplitter(file.text.toString())
 
         file.eachLine { line, count ->
-            if (count == 1) // überprüfen auf Überschriftzeile
+            if (count == lineStart)
                 return
 
-            def split = line.split(';')
-            println "groesse: " + split.size() // raus finden ob mit oder ohne wm additionals
+            def split = line.split(splitter)
+
+
+            def includingAdditional = false
+            if (split.size() == 77) {
+                includingAdditional = true
+            }
+
             def uniqueDocumentId = xmlDataSuppliereShort + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
             def reportingDate = split[4]
             def outputFileName = split[0] + "_" + reportingDate + "_" + xmlDataSuppliereShort + ".xml"
@@ -114,81 +143,89 @@ originDir.eachFile { file ->
                                         PensionSchemeGermany(split[33])
                                     }
                                     TimeHorizon {
-                                        split[34] ? Years(split[34]) : Category(split[35])
+                                        def temp = split[34]
+
+                                        if (temp.isDouble()) {
+                                            Years(temp)
+                                        } else {
+                                            Category(temp)
+                                        }
                                     }
-                                    MaturityDate(split[36])
-                                    MayBeTerminatedEarly(split[37])
-                                    SpecificInvestmentNeed(split[38])
+                                    MaturityDate(split[35])
+                                    MayBeTerminatedEarly(split[36])
+                                    SpecificInvestmentNeed(split[37])
                                 }
                                 DistributionStrategy {
-                                    ExecutionOnly(split[39])
-                                    ExecutionWithCheckOrNonAdvisedServices(split[40])
-                                    InvestmentAdvice(split[41])
-                                    PortfolioManagement(split[42])
+                                    ExecutionOnly(split[38])
+                                    ExecutionWithCheckOrNonAdvisedServices(split[39])
+                                    InvestmentAdvice(split[40])
+                                    PortfolioManagement(split[41])
                                 }
                                 CostsAndChargesExAnte {
-                                    if (split[44] != null && split[44] != "") {
+                                    if (split[43] != null && split[43] != "") {
                                         // entweder fonds - oder structured security
                                         Fund {
-                                            EntryCost(split[44])
-                                            MaxEntryCostItaly(split[46])
-                                            MaxEntryCostAcquired(split[47])
-                                            MaxExitCost(split[48])
-                                            MaxExitCostItaly(split[49])
-                                            MaxExitCostAcquired(split[50])
-                                            TypicalExitCost(split[51])
-                                            OngoingCosts(split[54])
-                                            ManagementFee(split[56])
-                                            DistributionFee(split[58])
-                                            TransactionCosts(split[59])
-                                            IncidentalCosts(split[60])
+                                            EntryCost(split[43])
+                                            MaxEntryCostItaly(split[45])
+                                            MaxEntryCostAcquired(split[46])
+                                            MaxExitCost(split[47])
+                                            MaxExitCostItaly(split[48])
+                                            MaxExitCostAcquired(split[49])
+                                            TypicalExitCost(split[50])
+                                            OngoingCosts(split[53])
+                                            ManagementFee(split[55])
+                                            DistributionFee(split[57])
+                                            TransactionCosts(split[58])
+                                            IncidentalCosts(split[59])
                                         }
                                     } else {
                                         StructuredSecurity {
-                                            Quotation(split[43])
-                                            OneOfEntryCost(split[45])
-                                            TypicalExitCost(split[52])
-                                            ExitCostPriorRHP(split[53])
-                                            OngoingCosts(split[55])
-                                            ManagementFee(split[57])
+                                            Quotation(split[42])
+                                            OneOfEntryCost(split[44])
+                                            TypicalExitCost(split[51])
+                                            ExitCostPriorRHP(split[52])
+                                            OngoingCosts(split[54])
+                                            ManagementFee(split[56])
                                         }
                                     }
                                 }
                                 CostsAndChargesExPost {
-                                    if (split[61] == null || split[61] == "") {
+                                    if (split[60] == null || split[60] == "") {
                                         Fund {
-                                            OngoingCosts(split[63])
-                                            ManagementFee(split[66])
-                                            DistributionFee(split[68])
-                                            TransactionCosts(split[69])
-                                            IncidentialCosts(split[70])
+                                            OngoingCosts(split[62])
+                                            ManagementFee(split[65])
+                                            DistributionFee(split[67])
+                                            TransactionCosts(split[68])
+                                            IncidentialCosts(split[69])
                                             CalculationPeriod {
-                                                Start(split[71])
-                                                End(split[72])
+                                                Start(split[70])
+                                                End(split[71])
                                             }
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         StructuredSecurity {
-                                            EntryCost(split[61])
-                                            ExitCost(split[62])
-                                            OngoingCosts(split[64])
-                                            OngoingCostsAccumulated(split[65])
-                                            ManagementFee(split[67])
+                                            EntryCost(split[60])
+                                            ExitCost(split[61])
+                                            OngoingCosts(split[63])
+                                            OngoingCostsAccumulated(split[64])
+                                            ManagementFee(split[66])
                                         }
                                     }
                                 }
-                                CountrySpecificData {
-                                    DE {
-                                        EMT_Additional {
-                                            TargetMarketInformation {
-                                                ModusApproval(split[73])
-                                                SpecialRequirementsDescription(split[74])
-                                                NatureProductCategory(split[75])
-                                                ApprovalProcess(split[76])
-                                            }
-                                            CostTransparency {
-                                                SwingPricing(split[77])
+
+                                if (includingAdditional) {
+                                    CountrySpecificData {
+                                        DE {
+                                            EMT_Additional {
+                                                TargetMarketInformation {
+                                                    ModusApproval(split[72])
+                                                    SpecialRequirementsDescription(split[73])
+                                                    NatureProductCategory(split[74])
+                                                    ApprovalProcess(split[75])
+                                                }
+                                                CostTransparency {
+                                                    SwingPricing(split[76])
+                                                }
                                             }
                                         }
                                     }

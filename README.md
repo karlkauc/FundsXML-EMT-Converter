@@ -33,8 +33,6 @@ all csv files in current directory
 ### output
 Valid FundsXML 4.1.0 files in current directory
 
-  
-
 
 # License
 Apache 2 license...

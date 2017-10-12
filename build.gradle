@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 
 mainClassName = 'convert'
-version = "0.1"
+version = "0.2"
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
