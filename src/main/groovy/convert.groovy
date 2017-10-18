@@ -1,8 +1,26 @@
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
+import groovyjarjarcommonscli.Option
 
 import javax.xml.bind.DatatypeConverter
 import java.util.logging.Logger
+
+def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-0.1.jar')
+
+cli.with {
+    h(longOpt: 'help', 'Help', args: 0, required: false)
+    d(longOpt: 'directories', 'Two arguments, separated by a comma', args: Option.UNLIMITED_VALUES, valueSeparator: ',', required: false)
+    s(longOpt: 'strings', 'Strings (class names) to search for in JARs', args: Option.UNLIMITED_VALUES, valueSeparator: ',', required: false)
+}
+
+def opt = cli.parse(args)
+if (opt.h)  {
+    cli.usage()
+}
+if (opt.d) {
+    println "directory: " + opt.d
+}
+
 
 def originDir = new File(".")
 
@@ -15,7 +33,6 @@ Logger log = Logger.getLogger("")
 
 def lineStart = 1
 def splitter = ';'
-
 
 // generate random String for uniqueness
 def generator = { String alphabet, int n ->
