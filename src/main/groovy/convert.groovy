@@ -1,12 +1,10 @@
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
-import groovyjarjarcommonscli.Option
 
 import javax.xml.bind.DatatypeConverter
 import java.util.logging.Logger
 
 def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-0.1.jar')
-
 cli.with {
     h(longOpt: 'help', 'Help', args: 0, required: false)
     d(longOpt: 'dirfile', 'Verzeichnis oder File zum Bearbeiten', args: 1, required: false)
@@ -27,17 +25,15 @@ if (opt.d && opt.d != 'auto') {
 
 def splitter = opt.s
 
-
 def xmlSystemCountry = 'AT'
 def xmlDataSuppliereShort = "ESK"
 def xmlDataSuppliereName = "ESPA"
 def xmlDataSuppliereType = 'IC'
 
-Calendar today = Calendar.getInstance();
+Calendar today = Calendar.getInstance()
 Logger log = Logger.getLogger("")
 
 def lineStart = 1
-
 
 // generate random String for uniqueness
 def generator = { String alphabet, int n ->
@@ -65,34 +61,31 @@ def static getSplitter(String s) {
 }
 
 // Liste mit Files zum Bearbeiten
-def originFileList = []
+List<File> originFileList = []
 if (originDir.isDirectory()) {
-    originDir.eachFile { file ->
-        if (file.name.toLowerCase().endsWith(".csv")) {
-            originFileList.add(file)
-        }
-    }
+    originDir.eachFileMatch(~/.*\.csv/) { file -> originFileList.add(file) }
 } else {
     if (originDir.isFile()) {
         originFileList.add(originDir)
+    } else {
+        log.info("NOT A FILE: [" + originDir + "]")
     }
 }
-
+log.info("Processing file list: " + originFileList.join(';'))
 
 originFileList.each { file ->
-
-    log.info("processing file: " + file.toPath())
+    log.info("start converting file: " + file.toPath())
     println "splitter: " + splitter
-    if (splitter == null || splitter == "" || splitter == 'auto' || splitter == false) {
+    if (splitter == null || splitter == "" || splitter == 'auto' || !splitter.asBoolean()) {
         splitter = getSplitter(file.text.toString())
     }
-    println "splitter: " + splitter
+    println "splitter: " + splitter.toString()
 
     file.eachLine { line, count ->
         if (count == lineStart)
             return
 
-        def split = line.split(splitter)
+        def split = line.split(splitter.toString())
 
         def includingAdditional = false
         if (split.size() == 77) {
@@ -106,8 +99,7 @@ originFileList.each { file ->
         def writer = new StringWriter()
         def fXML = new MarkupBuilder(writer)
 
-        fXML.FundsXML4(["xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation": "C:\\Data\\src\\FundsXML\\4.1.0\\FundsXML_4.1.0.xsd"]) {
-            // https://fdp-service.oekb.at/FundsXML_4.0.1_AI.xsd
+        fXML.FundsXML4(["xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation": "http://www.xml-tools.net/fundsxml/xsd/FundsXML4.1.0.xsd"]) {
             ControlData {
                 UniqueDocumentID(uniqueDocumentId)
                 DocumentGenerated(DatatypeConverter.printDateTime(today))
@@ -275,12 +267,10 @@ originFileList.each { file ->
                 }
             }
         }
-        println "LINE:  " + line
-        println XmlUtil.serialize(writer.toString())
+        log.info "LINE:  " + line
+        log.info XmlUtil.serialize(writer.toString())
 
-        if (new File(outputFileName).exists()) {
-            new File(outputFileName).delete()
-        }
+        new File(outputFileName).exists() ?: new File(outputFileName).delete()
         new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
     }
 }
