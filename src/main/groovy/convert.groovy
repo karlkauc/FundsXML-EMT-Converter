@@ -6,29 +6,38 @@ import java.util.logging.Logger
 
 def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-0.1.jar')
 cli.with {
-    h(longOpt: 'help', 'Help', args: 0, required: false)
-    d(longOpt: 'dirfile', 'Verzeichnis oder File zum Bearbeiten', args: 1, required: false)
-    s(longOpt: 'seperator', 'CSV seperator', args: 1, required: false)
+    h longOpt: 'help', 'Help', args: 0, required: false
+    d longOpt: 'dirfile', argName: 'file or directory', 'Verzeichnis oder File zum Bearbeiten', args: 1, required: false
+    s longOpt: 'seperator', 'CSV seperator', args: 1, required: false
+    xs longOpt: 'supplierShort', 'Data Supplier Short Name', args: 1, required: false
+    xn longOpt: 'supplierName', 'Data Supplier Long Name', args: 1, required: false
+    xt longOpt: 'supplierType', 'Data Supplier Type', args: 1, required: false
+    sc longOpt: 'systemCountry', 'System Country', args: 1, required: false
 }
 
 def opt = cli.parse(args)
 if (opt.h) {
     cli.usage()
+    System.exit(0)
 }
 
 File originDir
-if (opt.d && opt.d != 'auto') {
-    originDir = new File(opt.d)
-} else {
-    originDir = new File(".")
-}
+if (opt.d && opt.d != 'auto') { originDir = new File(opt.d) } else { originDir = new File(".") }
 
 def splitter = opt.s
 
-def xmlSystemCountry = 'AT'
-def xmlDataSuppliereShort = "ESK"
-def xmlDataSuppliereName = "ESPA"
-def xmlDataSuppliereType = 'IC'
+def xmlSystemCountry
+if (opt.sc) { xmlSystemCountry = 'AT' } else { xmlSystemCountry = opt.sc }
+
+def xmlDataSuppliereShort
+if (opt.xs) { xmlDataSuppliereShort = 'XXX' } else { xmlDataSuppliereShort = opt.xs }
+
+def xmlDataSuppliereName
+if (opt.xs) { xmlDataSuppliereName = 'XXXX' } else { xmlDataSuppliereName = opt.xs }
+
+def xmlDataSuppliereType
+if (opt.xt) { xmlDataSuppliereType = 'IC' } else { xmlDataSuppliereType = opt.xt }
+
 
 Calendar today = Calendar.getInstance()
 Logger log = Logger.getLogger("")
