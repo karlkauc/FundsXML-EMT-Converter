@@ -1,8 +1,26 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+        classpath 'edu.sc.seis.gradle:launch4j:2.4.2'
+        classpath "gradle.plugin.edu.sc.seis:macAppBundle:2.1.9"
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'edu.sc.seis.launch4j'
+apply plugin: "edu.sc.seis.macAppBundle"
+
 apply plugin: 'groovy'
 apply plugin: 'application'
 
 mainClassName = 'convert'
-version = "0.2"
+version = '0.2'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -15,16 +33,21 @@ dependencies {
     compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.12'
 }
 
-task fatJar(type: Jar) {
+jar {
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': version,
                 'Built-By': System.getProperty('user.name'),
                 'Built-Date': new Date(),
-                'Built-JDK': System.getProperty('java.version'),
-                'Main-Class': mainClassName
+                'Built-JDK': System.getProperty('java.version')
     }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+}
+
+launch4j {
+    outfile = project.name + '-all.exe'
+    mainClassName = mainClassName
+    copyConfigurable = project.tasks.shadowJar.outputs.files
+    jar = "lib/${project.tasks.shadowJar.archiveName}"
+    headerType = "console"
+    icon = "${projectDir}/ico/logo.ico"
 }
