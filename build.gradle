@@ -22,8 +22,8 @@ apply plugin: 'application'
 mainClassName = 'convert'
 version = '0.1'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 repositories {
     mavenCentral()
@@ -34,7 +34,6 @@ dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
-
 }
 
 jar {
@@ -53,5 +52,5 @@ launch4j {
     copyConfigurable = project.tasks.shadowJar.outputs.files
     jar = "lib/${project.tasks.shadowJar.archiveName}"
     headerType = "console"
-    // icon = "${projectDir}/ico/logo.ico"
+    icon = "${projectDir}/documents/mifid.ico"
 }
