@@ -1,8 +1,16 @@
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
 import javax.xml.bind.DatatypeConverter
-import java.util.logging.Logger
+
+Logger log = LogManager.getLogger()
+
+log.debug("debug")
+log.error("error")
+log.info("info")
+
 
 def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-0.1.jar')
 cli.with {
@@ -40,7 +48,6 @@ if (opt.xt) { xmlDataSuppliereType = 'IC' } else { xmlDataSuppliereType = opt.xt
 
 
 Calendar today = Calendar.getInstance()
-Logger log = Logger.getLogger("")
 
 def lineStart = 1
 
