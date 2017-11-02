@@ -5,9 +5,9 @@ import org.apache.logging.log4j.Logger
 
 import javax.xml.bind.DatatypeConverter
 
-println new Date()
+//println new Date()
 final Logger log = LogManager.getLogger(getClass().getName())
-println new Date()
+//println new Date()
 
 
 def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-0.1.jar')
@@ -21,8 +21,7 @@ cli.with {
     sc longOpt: 'systemCountry', 'System Country', args: 1, required: false
 }
 
-println new Date()
-
+//println new Date()
 
 def opt = cli.parse(args)
 if (opt.h) {
@@ -305,8 +304,8 @@ originFileList.each { file ->
                 }
             }
         }
-        log.debug "LINE:  " + line
-        // log.info XmlUtil.serialize(writer.toString())
+//        log.debug "LINE:  " + line
+         log.info XmlUtil.serialize(writer.toString())
 
         new File(outputFileName).exists() ?: new File(outputFileName).delete()
         new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
