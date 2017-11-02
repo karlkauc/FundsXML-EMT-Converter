@@ -5,11 +5,9 @@ import org.apache.logging.log4j.Logger
 
 import javax.xml.bind.DatatypeConverter
 
-Logger log = LogManager.getLogger()
-
-log.debug("debug")
-log.error("error")
-log.info("info")
+println new Date()
+final Logger log = LogManager.getLogger(getClass().getName())
+println new Date()
 
 
 def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-0.1.jar')
@@ -23,32 +21,47 @@ cli.with {
     sc longOpt: 'systemCountry', 'System Country', args: 1, required: false
 }
 
+println new Date()
+
+
 def opt = cli.parse(args)
 if (opt.h) {
     cli.usage()
     System.exit(0)
 }
 
+log.debug "Starting..."
+
 File originDir
-if (opt.d && opt.d != 'auto') { originDir = new File(opt.d) } else { originDir = new File(".") }
+if (opt.d && opt.d != 'auto') {
+    originDir = new File(opt.d)
+    log.info "setting auto file/directory to: " + originDir.name
+} else {
+    originDir = new File(".")
+    log.info "setting user definied file/directory to: " + originDir.name
+}
 
 def splitter = opt.s
 
 def xmlSystemCountry
-if (opt.sc) { xmlSystemCountry = 'AT' } else { xmlSystemCountry = opt.sc }
+if (!opt.sc) { xmlSystemCountry = 'AT' } else { xmlSystemCountry = opt.sc }
+log.info "setting xmlSystemCountry to: " + xmlSystemCountry
 
 def xmlDataSuppliereShort
-if (opt.xs) { xmlDataSuppliereShort = 'XXX' } else { xmlDataSuppliereShort = opt.xs }
+if (!opt.xs) { xmlDataSuppliereShort = 'XXX' } else { xmlDataSuppliereShort = opt.xs }
+log.info "setting xmlDataSuppliereShort to: " + xmlDataSuppliereShort
+
 
 def xmlDataSuppliereName
-if (opt.xs) { xmlDataSuppliereName = 'XXXX' } else { xmlDataSuppliereName = opt.xs }
+if (!opt.xs) { xmlDataSuppliereName = 'XXXX' } else { xmlDataSuppliereName = opt.xs }
+log.info "setting xmlDataSuppliereName to: " + xmlDataSuppliereName
+
 
 def xmlDataSuppliereType
-if (opt.xt) { xmlDataSuppliereType = 'IC' } else { xmlDataSuppliereType = opt.xt }
-
+if (!opt.xt) { xmlDataSuppliereType = 'IC' } else { xmlDataSuppliereType = opt.xt }
+log.info "setting xmlDataSuppliereType to: " + xmlDataSuppliereType
 
 Calendar today = Calendar.getInstance()
-
 def lineStart = 1
 
 // generate random String for uniqueness
@@ -91,11 +104,13 @@ log.info("Processing file list: " + originFileList.join(';'))
 
 originFileList.each { file ->
     log.info("start converting file: " + file.toPath())
-    println "splitter: " + splitter
     if (splitter == null || splitter == "" || splitter == 'auto' || !splitter.asBoolean()) {
         splitter = getSplitter(file.text.toString())
+        log.info "auto detect splitter: " + splitter
     }
-    println "splitter: " + splitter.toString()
+    else {
+        log.info "using user defined splitter: " + splitter
+    }
 
     file.eachLine { line, count ->
         if (count == lineStart)
@@ -106,11 +121,18 @@ originFileList.each { file ->
         def includingAdditional = false
         if (split.size() == 77) {
             includingAdditional = true
+            log.info "csv includes EMT Additional data"
+        }
+        else {
+            log.info "csv does not include EMT additional data"
         }
 
         def uniqueDocumentId = xmlDataSuppliereShort + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
         def reportingDate = split[4]
         def outputFileName = split[0] + "_" + reportingDate + "_" + xmlDataSuppliereShort + ".xml"
+        log.debug ("uniqueDocumentId: " + uniqueDocumentId)
+        log.debug ("reportingDate: " + reportingDate)
+        log.debug ("outputFileName: "+ outputFileName)
 
         def writer = new StringWriter()
         def fXML = new MarkupBuilder(writer)
@@ -283,11 +305,12 @@ originFileList.each { file ->
                 }
             }
         }
-        log.info "LINE:  " + line
-        log.info XmlUtil.serialize(writer.toString())
+        log.debug "LINE:  " + line
+        // log.info XmlUtil.serialize(writer.toString())
 
         new File(outputFileName).exists() ?: new File(outputFileName).delete()
         new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
+        log.debug "written: " + new File(outputFileName).size() + " bytes"
     }
 }
 
