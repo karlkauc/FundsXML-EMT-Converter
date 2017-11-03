@@ -19,6 +19,7 @@ cli.with {
     xn longOpt: 'supplierName', 'Data Supplier Long Name', args: 1, required: false
     xt longOpt: 'supplierType', 'Data Supplier Type', args: 1, required: false
     sc longOpt: 'systemCountry', 'System Country', args: 1, required: false
+    ih longOpt: 'includeHeader', 'if parameter is given csv file include header', args: 0, required: false
 }
 
 //println new Date()
@@ -59,6 +60,9 @@ log.info "setting xmlDataSuppliereName to: " + xmlDataSuppliereName
 def xmlDataSuppliereType
 if (!opt.xt) { xmlDataSuppliereType = 'IC' } else { xmlDataSuppliereType = opt.xt }
 log.info "setting xmlDataSuppliereType to: " + xmlDataSuppliereType
+
+def includeHeader = opt.ih
+log.info "setting includeHeader to: " + includeHeader
 
 Calendar today = Calendar.getInstance()
 def lineStart = 1
@@ -112,8 +116,10 @@ originFileList.each { file ->
     }
 
     file.eachLine { line, count ->
-        if (count == lineStart)
+        if (count == lineStart && includeHeader) {
+            log.debug "skipping header line"
             return
+        }
 
         def split = line.split(splitter.toString())
 
