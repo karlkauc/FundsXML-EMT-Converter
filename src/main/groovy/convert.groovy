@@ -5,10 +5,7 @@ import org.apache.logging.log4j.Logger
 
 import javax.xml.bind.DatatypeConverter
 
-//println new Date()
 final Logger log = LogManager.getLogger(getClass().getName())
-//println new Date()
-
 
 def cli = new CliBuilder(usage: 'java -jar FundsXML-EMT-Converter-all-0.1.jar')
 cli.with {
@@ -21,8 +18,6 @@ cli.with {
     sc longOpt: 'systemCountry', 'System Country', args: 1, required: false
     ih longOpt: 'includeHeader', 'if parameter is given csv file include header', args: 0, required: false
 }
-
-//println new Date()
 
 def opt = cli.parse(args)
 if (opt.h) {
@@ -131,6 +126,9 @@ originFileList.each { file ->
         else {
             log.info "csv does not include EMT additional data"
         }
+
+        log.info "Reporting Date: " + split[4]
+        log.info "Size: " + split.size()
 
         def uniqueDocumentId = xmlDataSuppliereShort + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
         def reportingDate = split[4]
