@@ -96,7 +96,7 @@ def static getSplitter(String s) {
 // Liste mit Files zum Bearbeiten
 List<File> originFileList = []
 if (originDir.isDirectory()) {
-    originDir.eachFileMatch(~/.*\.csv/) { file -> originFileList.add(file) }
+    originDir.eachFile { file -> if (file.name.toLowerCase().endsWith('.csv')) originFileList.add(file)}
 } else {
     if (originDir.isFile()) {
         originFileList.add(originDir)
@@ -115,6 +115,8 @@ originFileList.each { file ->
     if (splitter == null || splitter == "" || splitter == 'auto' || !splitter.asBoolean()) {
         splitter = getSplitter(file.text.toString())
         log.info "auto detect splitter: " + splitter
+        if (splitter == "|")
+            splitter = '\\|'
     }
     else {
         log.info "using user defined splitter: " + splitter
@@ -140,6 +142,11 @@ originFileList.each { file ->
         def uniqueDocumentId = xmlDataSuppliereShort + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
         def reportingDate = split[4]
         def outputFileName = split[0] + "_" + reportingDate + "_" + xmlDataSuppliereShort + ".xml"
+
+
+//        log.debug ("LINE: " + line)
+//        log.debug ("SPLIT: " + split)
+
         log.debug ("uniqueDocumentId: " + uniqueDocumentId)
         log.debug ("reportingDate: " + reportingDate)
         log.debug ("outputFileName: "+ outputFileName)
