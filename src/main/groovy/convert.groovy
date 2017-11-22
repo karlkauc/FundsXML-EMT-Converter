@@ -105,6 +105,10 @@ if (originDir.isDirectory()) {
     }
 }
 log.info("Processing file list: " + originFileList.join(';'))
+if (originFileList.size() == 0) {
+    log.error("KEINE FILES ZUM BEARBEITEN GEFUNDEN!")
+    log.error("EVTL. PROGRAMM MIT OPTION -d <<Verzeichnis oder File>> STARTEN.")
+}
 
 originFileList.each { file ->
     log.info("start converting file: " + file.toPath())
