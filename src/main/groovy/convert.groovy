@@ -16,7 +16,7 @@ cli.with {
     xn longOpt: 'supplierName', 'Data Supplier Long Name', args: 1, required: false
     xt longOpt: 'supplierType', 'Data Supplier Type', args: 1, required: false
     sc longOpt: 'systemCountry', 'System Country', args: 1, required: false
-    ih longOpt: 'includeHeader', 'if parameter is given csv file include header', args: 0, required: false
+    ih longOpt: 'includeHeaderLines', 'csv file include X header lines', args: 1, required: false
 }
 
 def opt = cli.parse(args)
@@ -56,8 +56,14 @@ def xmlDataSuppliereType
 if (!opt.xt) { xmlDataSuppliereType = 'IC' } else { xmlDataSuppliereType = opt.xt }
 log.info "setting xmlDataSuppliereType to: " + xmlDataSuppliereType
 
-def includeHeader = opt.ih
-log.info "setting includeHeader to: " + includeHeader
+def skipHeaderLines
+if (opt.ih && opt.ih != 'auto') {
+    skipHeaderLines = 1
+}
+else {
+    skipHeaderLines = 0
+}
+log.info "skipping [" + skipHeaderLines + "] header lines."
 
 Calendar today = Calendar.getInstance()
 def lineStart = 1
@@ -111,8 +117,8 @@ originFileList.each { file ->
     }
 
     file.eachLine { line, count ->
-        if (count == lineStart && includeHeader) {
-            log.debug "skipping header line"
+        if (count <= skipHeaderLines) {
+            log.info "skipping header line"
             return
         }
 
@@ -126,9 +132,6 @@ originFileList.each { file ->
         else {
             log.info "csv does not include EMT additional data"
         }
-
-        log.info "Reporting Date: " + split[4]
-        log.info "Size: " + split.size()
 
         def uniqueDocumentId = xmlDataSuppliereShort + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
         def reportingDate = split[4]
@@ -151,6 +154,11 @@ originFileList.each { file ->
                     Short(xmlDataSuppliereShort)
                     Name(xmlDataSuppliereName)
                     Type(xmlDataSuppliereType)
+                }
+                CountrySpecificData {
+                    AT {
+                        FundDataPortalContent('REG')
+                    }
                 }
             }
             RegulatoryReportings {
@@ -308,12 +316,11 @@ originFileList.each { file ->
                 }
             }
         }
-//        log.debug "LINE:  " + line
-         log.info XmlUtil.serialize(writer.toString())
+         log.debug XmlUtil.serialize(writer.toString())
 
         new File(outputFileName).exists() ?: new File(outputFileName).delete()
         new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
-        log.debug "written: " + new File(outputFileName).size() + " bytes"
+        log.info "written: " + new File(outputFileName).size() + " bytes"
     }
 }
 
