@@ -197,7 +197,7 @@ originFileList.each { file ->
                                 IssuerName(split[6])
                                 GuarantorName(split[7])
                                 ProductCategoryNature(split[8])
-                                LeveragedOrContingentLiability(split[9])
+                                !split[9] ?: LeveragedOrContingentLiability(split[9])
                             }
                             InvestorType {
                                 Retail(split[10])
@@ -212,8 +212,8 @@ originFileList.each { file ->
                             }
                             AbilityToBearLosses {
                                 NoCapitalLoss(split[17])
-                                LimitedCapitalLoss(split[18])
-                                LimitedCapitalLossLevel(split[19])
+                                !split[18] ?: LimitedCapitalLoss(split[18])
+                                !split[19] ?: LimitedCapitalLossLevel(split[19])
                                 NoCapitalGuarantee(split[20])
                                 LossBeyondCapital(split[21])
                             }
@@ -221,8 +221,8 @@ originFileList.each { file ->
                                 PRIIPSMethodology(split[22])
                                 UCITSMethodology(split[23])
                                 InternalMethodology(split[24])
-                                MethodologySpain(split[25])
-                                NotForInvestorsWithLowestRiskToleranceGermany(split[26])
+                                !split[25] ?: MethodologySpain(split[25])
+                                !split[26] ?: NotForInvestorsWithLowestRiskToleranceGermany(split[26])
                             }
                             ClientObjectives {
                                 ReturnProfile {
@@ -243,7 +243,7 @@ originFileList.each { file ->
                                         Category(temp)
                                     }
                                 }
-                                MaturityDate(split[35])
+                                !split[35] ?: MaturityDate(split[35])
                                 MayBeTerminatedEarly(split[36])
                                 SpecificInvestmentNeed(split[37])
                             }
@@ -258,10 +258,10 @@ originFileList.each { file ->
                                     // entweder fonds - oder structured security
                                     Fund {
                                         EntryCost(split[43])
-                                        MaxEntryCostItaly(split[45])
+                                        !split[45] ? MaxEntryCostItaly(0) : MaxEntryCostItaly(split[45])
                                         MaxEntryCostAcquired(split[46])
                                         MaxExitCost(split[47])
-                                        MaxExitCostItaly(split[48])
+                                        !split[48] ? MaxExitCostItaly(0) : MaxExitCostItaly(split[48])
                                         MaxExitCostAcquired(split[49])
                                         TypicalExitCost(split[50])
                                         OngoingCosts(split[53])
