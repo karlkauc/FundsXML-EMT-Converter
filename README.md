@@ -18,7 +18,7 @@ To build the converter from source you need:
 2. (optional)  [GIT](https://git-scm.com/downloads) 
 
 Clone the project with GIT - or download a .zip version from this site.  
-Open a command line client and type "./gradle build" (or "gradlew.bat build" on Windows)
+Open a command line client and type "./gradlew build" (or "gradlew.bat build" on Windows)
 
 The compiled converter can be started with "java -jar build\libs\FundsXML-EMT-Converter-all-0.1.jar" on all platforms (or "build\launch4j\FundsXML-EMT-Converter-all.exe" on Windows)
 
@@ -28,15 +28,19 @@ java -jar FundsXML-EMT-Converter-all-0.1.jar
   
 ### input parameter
 ```
- usage: java -jar FundsXML-EMT-Converter-all-0.1.jar
-  -d,--dirfile <file or directory>   Verzeichnis oder File zum Bearbeiten
-  -h,--help                          Help
-  -s,--seperator <arg>               CSV seperator
-  -sc,--systemCountry <arg>          System Country
-  -xn,--supplierName <arg>           Data Supplier Long Name
-  -xs,--supplierShort <arg>          Data Supplier Short Name
-  -xt,--supplierType <arg>           Data Supplier Type
+usage: java -jar FundsXML-EMT-Converter-all-0.1.jar
+ -d,--dirfile <file or directory>   Verzeichnis oder File zum Bearbeiten
+ -h,--help                          Help
+ -ih,--includeHeaderLines <arg>     csv file include X header lines
+ -s,--seperator <arg>               CSV seperator
+ -sc,--systemCountry <arg>          System Country
+ -xn,--supplierName <arg>           Data Supplier Long Name
+ -xs,--supplierShort <arg>          Data Supplier Short Name
+ -xt,--supplierType <arg>           Data Supplier Type
+
 ```
+
+
 
 ### output
 Valid FundsXML 4.1.0 files in current directory.
