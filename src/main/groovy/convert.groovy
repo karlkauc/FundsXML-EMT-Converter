@@ -39,28 +39,43 @@ if (opt.d && opt.d != 'auto') {
 def splitter = opt.s
 
 def xmlSystemCountry
-if (!opt.sc) { xmlSystemCountry = 'AT' } else { xmlSystemCountry = opt.sc }
+if (!opt.sc) {
+    xmlSystemCountry = 'AT'
+} else {
+    xmlSystemCountry = opt.sc
+}
 log.info "setting xmlSystemCountry to: " + xmlSystemCountry
 
 def xmlDataSuppliereShort
-if (!opt.xs) { xmlDataSuppliereShort = 'XXX' } else { xmlDataSuppliereShort = opt.xs }
+if (!opt.xs) {
+    xmlDataSuppliereShort = 'XXX'
+} else {
+    xmlDataSuppliereShort = opt.xs
+}
 log.info "setting xmlDataSuppliereShort to: " + xmlDataSuppliereShort
 
 
 def xmlDataSuppliereName
-if (!opt.xs) { xmlDataSuppliereName = 'XXXX' } else { xmlDataSuppliereName = opt.xs }
+if (!opt.xs) {
+    xmlDataSuppliereName = 'XXXX'
+} else {
+    xmlDataSuppliereName = opt.xs
+}
 log.info "setting xmlDataSuppliereName to: " + xmlDataSuppliereName
 
 
 def xmlDataSuppliereType
-if (!opt.xt) { xmlDataSuppliereType = 'IC' } else { xmlDataSuppliereType = opt.xt }
+if (!opt.xt) {
+    xmlDataSuppliereType = 'IC'
+} else {
+    xmlDataSuppliereType = opt.xt
+}
 log.info "setting xmlDataSuppliereType to: " + xmlDataSuppliereType
 
 def skipHeaderLines
 if (opt.ih && opt.ih != 'auto') {
     skipHeaderLines = 1
-}
-else {
+} else {
     skipHeaderLines = 0
 }
 log.info "skipping [" + skipHeaderLines + "] header lines."
@@ -96,7 +111,7 @@ def static getSplitter(String s) {
 // Liste mit Files zum Bearbeiten
 List<File> originFileList = []
 if (originDir.isDirectory()) {
-    originDir.eachFile { file -> if (file.name.toLowerCase().endsWith('.csv')) originFileList.add(file)}
+    originDir.eachFile { file -> if (file.name.toLowerCase().endsWith('.csv')) originFileList.add(file) }
 } else {
     if (originDir.isFile()) {
         originFileList.add(originDir)
@@ -117,8 +132,7 @@ originFileList.each { file ->
         log.info "auto detect splitter: " + splitter
         if (splitter == "|")
             splitter = '\\|'
-    }
-    else {
+    } else {
         log.info "using user defined splitter: " + splitter
     }
 
@@ -134,8 +148,7 @@ originFileList.each { file ->
         if (split.size() == 77) {
             includingAdditional = true
             log.info "csv includes EMT Additional data"
-        }
-        else {
+        } else {
             log.info "csv does not include EMT additional data"
         }
 
@@ -143,13 +156,9 @@ originFileList.each { file ->
         def reportingDate = split[4]
         def outputFileName = split[0] + "_" + reportingDate + "_" + xmlDataSuppliereShort + ".xml"
 
-
-//        log.debug ("LINE: " + line)
-//        log.debug ("SPLIT: " + split)
-
-        log.debug ("uniqueDocumentId: " + uniqueDocumentId)
-        log.debug ("reportingDate: " + reportingDate)
-        log.debug ("outputFileName: "+ outputFileName)
+        log.debug("uniqueDocumentId: " + uniqueDocumentId)
+        log.debug("reportingDate: " + reportingDate)
+        log.debug("outputFileName: " + outputFileName)
 
         def writer = new StringWriter()
         def fXML = new MarkupBuilder(writer)
@@ -195,8 +204,8 @@ originFileList.each { file ->
                                 ReportingDate(split[4])
                                 LegalStructure(split[5])
                                 IssuerName(split[6])
-                                GuarantorName(split[7])
-                                ProductCategoryNature(split[8])
+                                !split[7] ?: GuarantorName(split[7])
+                                !split[8] ?: ProductCategoryNature(split[8])
                                 !split[9] ?: LeveragedOrContingentLiability(split[9])
                             }
                             InvestorType {
@@ -208,7 +217,7 @@ originFileList.each { file ->
                                 BasicInvestor(split[13])
                                 InformedInvestor(split[14])
                                 AdvancedInvestor(split[15])
-                                ExpertInvestorGermany(split[16])
+                                !split[16] ?: ExpertInvestorGermany(split[16])
                             }
                             AbilityToBearLosses {
                                 NoCapitalLoss(split[17])
@@ -218,9 +227,9 @@ originFileList.each { file ->
                                 LossBeyondCapital(split[21])
                             }
                             RiskTolerance {
-                                PRIIPSMethodology(split[22])
-                                UCITSMethodology(split[23])
-                                InternalMethodology(split[24])
+                                !split[22] ?: PRIIPSMethodology(split[22])
+                                !split[23] ?: UCITSMethodology(split[23])
+                                !split[24] ?: InternalMethodology(split[24])
                                 !split[25] ?: MethodologySpain(split[25])
                                 !split[26] ?: NotForInvestorsWithLowestRiskToleranceGermany(split[26])
                             }
@@ -232,7 +241,7 @@ originFileList.each { file ->
                                     Hedging(split[30])
                                     OptionOrLeveraged(split[31])
                                     Other(split[32])
-                                    PensionSchemeGermany(split[33])
+                                    !split[33] ?: PensionSchemeGermany(split[33])
                                 }
                                 TimeHorizon {
                                     def temp = split[34]
@@ -244,14 +253,14 @@ originFileList.each { file ->
                                     }
                                 }
                                 !split[35] ?: MaturityDate(split[35])
-                                MayBeTerminatedEarly(split[36])
-                                SpecificInvestmentNeed(split[37])
+                                !split[36] ?: MayBeTerminatedEarly(split[36])
+                                !split[37] ?: SpecificInvestmentNeed(split[37])
                             }
                             DistributionStrategy {
-                                ExecutionOnly(split[38])
-                                ExecutionWithCheckOrNonAdvisedServices(split[39])
-                                InvestmentAdvice(split[40])
-                                PortfolioManagement(split[41])
+                                !split[38] ?: ExecutionOnly(split[38])
+                                !split[39] ?: ExecutionWithCheckOrNonAdvisedServices(split[39])
+                                !split[40] ?: InvestmentAdvice(split[40])
+                                !split[41] ?: PortfolioManagement(split[41])
                             }
                             CostsAndChargesExAnte {
                                 if (split[43] != null && split[43] != "") {
@@ -263,10 +272,10 @@ originFileList.each { file ->
                                         MaxExitCost(split[47])
                                         !split[48] ? MaxExitCostItaly(0) : MaxExitCostItaly(split[48])
                                         MaxExitCostAcquired(split[49])
-                                        TypicalExitCost(split[50])
+                                        !split[50] ?: TypicalExitCost(split[50])
                                         OngoingCosts(split[53])
                                         ManagementFee(split[55])
-                                        DistributionFee(split[57])
+                                        !split[57] ?: DistributionFee(split[57])
                                         TransactionCosts(split[58])
                                         IncidentalCosts(split[59])
                                     }
@@ -274,10 +283,10 @@ originFileList.each { file ->
                                     StructuredSecurity {
                                         Quotation(split[42])
                                         OneOfEntryCost(split[44])
-                                        TypicalExitCost(split[51])
-                                        ExitCostPriorRHP(split[52])
+                                        !split[51] ?: TypicalExitCost(split[51])
+                                        !split[52] ?: ExitCostPriorRHP(split[52])
                                         OngoingCosts(split[54])
-                                        ManagementFee(split[56])
+                                        !split[56] ?: ManagementFee(split[56])
                                     }
                                 }
                             }
@@ -286,21 +295,23 @@ originFileList.each { file ->
                                     Fund {
                                         OngoingCosts(split[62])
                                         ManagementFee(split[65])
-                                        DistributionFee(split[67])
+                                        !split[67] ?: DistributionFee(split[67])
                                         TransactionCosts(split[68])
                                         IncidentialCosts(split[69])
-                                        CalculationPeriod {
-                                            Start(split[70])
-                                            End(split[71])
+                                        if (split[70] != null && split[71] != null) {
+                                            CalculationPeriod {
+                                                !split[70] ?: Start(split[70])
+                                                !split[71] ?: End(split[71])
+                                            }
                                         }
                                     }
                                 } else {
                                     StructuredSecurity {
-                                        EntryCost(split[60])
-                                        ExitCost(split[61])
+                                        !split[60] ?: EntryCost(split[60])
+                                        !split[61] ?: ExitCost(split[61])
                                         OngoingCosts(split[63])
-                                        OngoingCostsAccumulated(split[64])
-                                        ManagementFee(split[66])
+                                        !split[64] ?: OngoingCostsAccumulated(split[64])
+                                        !split[66] ?: ManagementFee(split[66])
                                     }
                                 }
                             }
@@ -311,7 +322,7 @@ originFileList.each { file ->
                                         EMT_Additional {
                                             TargetMarketInformation {
                                                 ModusApproval(split[72])
-                                                SpecialRequirementsDescription(split[73])
+                                                !split[73] ?: SpecialRequirementsDescription(split[73])
                                                 NatureProductCategory(split[74])
                                                 ApprovalProcess(split[75])
                                             }
@@ -327,7 +338,7 @@ originFileList.each { file ->
                 }
             }
         }
-         log.debug XmlUtil.serialize(writer.toString())
+        log.debug XmlUtil.serialize(writer.toString())
 
         new File(outputFileName).exists() ?: new File(outputFileName).delete()
         new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
