@@ -56,10 +56,10 @@ log.info "setting xmlDataSuppliereShort to: " + xmlDataSuppliereShort
 
 
 def xmlDataSuppliereName
-if (!opt.xs) {
+if (!opt.xn) {
     xmlDataSuppliereName = 'XXXX'
 } else {
-    xmlDataSuppliereName = opt.xs
+    xmlDataSuppliereName = opt.xn
 }
 log.info "setting xmlDataSuppliereName to: " + xmlDataSuppliereName
 
