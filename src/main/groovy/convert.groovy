@@ -51,6 +51,8 @@ if (!opt.xs) {
     xmlDataSuppliereShort = 'XXX'
 } else {
     xmlDataSuppliereShort = opt.xs
+    xmlDataSuppliereShort = removeQuotes(xmlDataSuppliereShort)
+
 }
 log.info "setting xmlDataSuppliereShort to: " + xmlDataSuppliereShort
 
@@ -60,6 +62,7 @@ if (!opt.xn) {
     xmlDataSuppliereName = 'XXXX'
 } else {
     xmlDataSuppliereName = opt.xn
+    xmlDataSuppliereName = removeQuotes(xmlDataSuppliereName)
 }
 log.info "setting xmlDataSuppliereName to: " + xmlDataSuppliereName
 
@@ -69,6 +72,7 @@ if (!opt.xt) {
     xmlDataSuppliereType = 'IC'
 } else {
     xmlDataSuppliereType = opt.xt
+    xmlDataSuppliereType = removeQuotes(xmlDataSuppliereType)
 }
 log.info "setting xmlDataSuppliereType to: " + xmlDataSuppliereType
 
@@ -346,3 +350,6 @@ originFileList.each { file ->
     }
 }
 
+static String removeQuotes(String s)  {
+    s.replace("'", "").replace("\"", "")
+}
