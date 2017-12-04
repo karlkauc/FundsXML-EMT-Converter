@@ -28,7 +28,7 @@ java -jar FundsXML-EMT-Converter-all-0.1.jar
   
 ### input parameter
 ```
-usage: java -jar FundsXML-EMT-Converter-all-0.1.jar
+usage: java -jar FundsXML-EMT-Converter-0.1-all.jar
  -d,--dirfile <file or directory>   Verzeichnis oder File zum Bearbeiten
  -h,--help                          Help
  -ih,--includeHeaderLines <arg>     csv file include X header lines
