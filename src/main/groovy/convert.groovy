@@ -69,7 +69,7 @@ log.info "setting xmlDataSuppliereName to: " + xmlDataSuppliereName
 
 def xmlDataSuppliereType
 if (!opt.xt) {
-    xmlDataSuppliereType = 'IC'
+    xmlDataSuppliereType = 'KAG'
 } else {
     xmlDataSuppliereType = opt.xt
     xmlDataSuppliereType = removeQuotes(xmlDataSuppliereType)
@@ -82,7 +82,7 @@ if (opt.ih && opt.ih != 'auto') {
 } else {
     skipHeaderLines = 0
 }
-log.info "skipping [" + skipHeaderLines + "] header lines."
+// log.info "skipping [" + skipHeaderLines + "] header lines."
 
 Calendar today = Calendar.getInstance()
 def lineStart = 1
@@ -110,6 +110,13 @@ def static getSplitter(String s) {
     return map.findAll { k, v -> possibleSplitter.contains(k.toString()) }.sort { e1, e2 ->
         e2.value <=> e1.value
     }.keySet().toArray()[0].toString()
+}
+
+def timeToProd =  Date.parse("yyyy-MM-dd","2017-12-21")
+def schemaLocation = "https://fdp-service.oekb.at/FundsXML_4.1.1_AI.xsd"
+if (new Date() <= timeToProd ) {
+    schemaLocation = "https://fdp-qas-service.oekb.at/FundsXML_4.1.1_AI.xsd"
+    log.info "writing QAS schema location"
 }
 
 // Liste mit Files zum Bearbeiten
@@ -141,12 +148,16 @@ originFileList.each { file ->
     }
 
     file.eachLine { line, count ->
-        if (count <= skipHeaderLines) {
-            log.info "skipping header line"
+        def split = line.split(splitter.toString())
+
+        // check if header exists
+        if ((count == 1 && split[0].size() != 12) || count <= skipHeaderLines)   {
+            log.info "skipping automatic header line"
             return
         }
-
-        def split = line.split(splitter.toString())
+        else {
+            log.info "Processing ISIN [" + split[0] + "]"
+        }
 
         def includingAdditional = false
         if (split.size() == 77) {
@@ -167,11 +178,11 @@ originFileList.each { file ->
         def writer = new StringWriter()
         def fXML = new MarkupBuilder(writer)
 
-        fXML.FundsXML4(["xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation": "http://www.xml-tools.net/fundsxml/xsd/FundsXML4.1.0.xsd"]) {
+        fXML.FundsXML4(["xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation": schemaLocation]) {
             ControlData {
                 UniqueDocumentID(uniqueDocumentId)
                 DocumentGenerated(DatatypeConverter.printDateTime(today))
-                Version("4.1.0")
+                Version("4.1.1")
                 ContentDate(reportingDate)
                 DataSupplier {
                     SystemCountry(xmlSystemCountry)
@@ -271,11 +282,11 @@ originFileList.each { file ->
                                     // entweder fonds - oder structured security
                                     Fund {
                                         EntryCost(split[43])
-                                        !split[45] ? MaxEntryCostItaly(0) : MaxEntryCostItaly(split[45])
-                                        MaxEntryCostAcquired(split[46])
+                                        !split[45] ?: MaxEntryCostItaly(split[45])
+                                        !split[46] ?: MaxEntryCostAcquired(split[46])
                                         MaxExitCost(split[47])
-                                        !split[48] ? MaxExitCostItaly(0) : MaxExitCostItaly(split[48])
-                                        MaxExitCostAcquired(split[49])
+                                        !split[48] ?: MaxExitCostItaly(split[48])
+                                        !split[49] ?: MaxExitCostAcquired(split[49])
                                         !split[50] ?: TypicalExitCost(split[50])
                                         OngoingCosts(split[53])
                                         ManagementFee(split[55])
@@ -350,6 +361,6 @@ originFileList.each { file ->
     }
 }
 
-static String removeQuotes(String s)  {
+static String removeQuotes(String s) {
     s.replace("'", "").replace("\"", "")
 }
