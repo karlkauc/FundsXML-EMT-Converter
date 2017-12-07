@@ -29,14 +29,14 @@ java -jar FundsXML-EMT-Converter-all-0.1.jar
 ### input parameter
 ```
 usage: java -jar FundsXML-EMT-Converter-0.1-all.jar
- -d,--dirfile <file or directory>   Verzeichnis oder File zum Bearbeiten
+ -d,--dirfile <file or directory>   Verzeichnis oder File zum Bearbeiten (default: .)
  -h,--help                          Help
- -ih,--includeHeaderLines <arg>     csv file include X header lines
- -s,--seperator <arg>               CSV seperator
- -sc,--systemCountry <arg>          System Country
- -xn,--supplierName <arg>           Data Supplier Long Name
- -xs,--supplierShort <arg>          Data Supplier Short Name
- -xt,--supplierType <arg>           Data Supplier Type
+ -ih,--includeHeaderLines <arg>     csv file include X header lines (default: auto)
+ -s,--seperator <arg>               CSV seperator (default: auto)
+ -sc,--systemCountry <arg>          System Country (default: AT)
+ -xn,--supplierName <arg>           Data Supplier Long Name (default: XXXX)
+ -xs,--supplierShort <arg>          Data Supplier Short Name (default: XXX)
+ -xt,--supplierType <arg>           Data Supplier Type (default: KAG)
 
 ```
 
@@ -46,4 +46,12 @@ usage: java -jar FundsXML-EMT-Converter-0.1-all.jar
 Valid FundsXML 4.1.0 files in current directory.
 One file per ISIN is created.  
 Filename: ```<ISIN>_<reportingDate>_<xmlDataSuppliereShort>.xml```
+
+
+### changelg
+2017-12-07: 
+* changed to FundsXML 4.1.1
+* new schema location
+* header lines auto detect
+* supplierType - default changed to "KAG"
 
