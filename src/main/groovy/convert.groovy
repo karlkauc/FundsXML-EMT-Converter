@@ -278,7 +278,7 @@ originFileList.each { file ->
                                 !split[41] ?: PortfolioManagement(split[41])
                             }
                             CostsAndChargesExAnte {
-                                if (split[43] != null && split[43] != "") {
+                                if (split[43] == null || split[43] == "") {
                                     // entweder fonds - oder structured security
                                     Fund {
                                         EntryCost(split[43])
