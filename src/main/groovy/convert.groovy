@@ -281,42 +281,42 @@ originFileList.each { file ->
                                 if (split[43] != null && split[43] != "") {
                                     // entweder fonds - oder structured security
                                     Fund {
-                                        EntryCost(split[43])
-                                        !split[45] ?: MaxEntryCostItaly(split[45])
-                                        !split[46] ?: MaxEntryCostAcquired(split[46])
-                                        MaxExitCost(split[47])
-                                        !split[48] ?: MaxExitCostItaly(split[48])
-                                        !split[49] ?: MaxExitCostAcquired(split[49])
-                                        !split[50] ?: TypicalExitCost(split[50])
-                                        OngoingCosts(split[53])
-                                        ManagementFee(split[55])
-                                        !split[57] ?: DistributionFee(split[57])
-                                        TransactionCosts(split[58])
-                                        IncidentalCosts(split[59])
+                                        EntryCost(split[43].trim())
+                                        !split[45] ?: MaxEntryCostItaly(split[45].trim())
+                                        !split[46] ?: MaxEntryCostAcquired(split[46].trim())
+                                        MaxExitCost(split[47].trim())
+                                        !split[48] ?: MaxExitCostItaly(split[48].trim())
+                                        !split[49] ?: MaxExitCostAcquired(split[49].trim())
+                                        !split[50] ?: TypicalExitCost(split[50].trim())
+                                        OngoingCosts(split[53].trim())
+                                        ManagementFee(split[55].trim())
+                                        !split[57] ?: DistributionFee(split[57].trim())
+                                        TransactionCosts(split[58].trim())
+                                        split[59].trim() ? IncidentalCosts(split[59].trim()) : IncidentalCosts(0)
                                     }
                                 } else {
                                     StructuredSecurity {
-                                        Quotation(split[42])
-                                        OneOfEntryCost(split[44])
-                                        !split[51] ?: TypicalExitCost(split[51])
-                                        !split[52] ?: ExitCostPriorRHP(split[52])
-                                        OngoingCosts(split[54])
-                                        !split[56] ?: ManagementFee(split[56])
+                                        Quotation(split[42].trim())
+                                        OneOfEntryCost(split[44].trim())
+                                        !split[51] ?: TypicalExitCost(split[51].trim())
+                                        !split[52] ?: ExitCostPriorRHP(split[52].trim())
+                                        OngoingCosts(split[54].trim())
+                                        !split[56] ?: ManagementFee(split[56].trim())
                                     }
                                 }
                             }
                             CostsAndChargesExPost {
                                 if (split[60] == null || split[60] == "") {
                                     Fund {
-                                        OngoingCosts(split[62])
-                                        ManagementFee(split[65])
-                                        !split[67] ?: DistributionFee(split[67])
-                                        TransactionCosts(split[68])
-                                        IncidentialCosts(split[69])
+                                        OngoingCosts(split[62].trim())
+                                        ManagementFee(split[65].trim())
+                                        !split[67] ?: DistributionFee(split[67].trim())
+                                        TransactionCosts(split[68].trim())
+                                        split[69].trim() ? IncidentialCosts(split[69].trim()) : IncidentialCosts(0)
                                         if (split[70] != null && split[71] != null) {
                                             CalculationPeriod {
-                                                !split[70] ?: Start(split[70])
-                                                !split[71] ?: End(split[71])
+                                                !split[70] ?: Start(split[70].trim())
+                                                !split[71] ?: End(split[71].trim())
                                             }
                                         }
                                     }
