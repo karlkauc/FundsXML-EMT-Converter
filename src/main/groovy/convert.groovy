@@ -112,9 +112,9 @@ def static getSplitter(String s) {
     }.keySet().toArray()[0].toString()
 }
 
-def timeToProd =  Date.parse("yyyy-MM-dd","2017-12-21")
+def timeToProd = Date.parse("yyyy-MM-dd", "2017-12-21")
 def schemaLocation = "https://fdp-service.oekb.at/FundsXML_4.1.1_AI.xsd"
-if (new Date() <= timeToProd ) {
+if (new Date() <= timeToProd) {
     schemaLocation = "https://fdp-qas-service.oekb.at/FundsXML_4.1.1_AI.xsd"
     log.info "writing QAS schema location"
 }
@@ -136,6 +136,7 @@ if (originFileList.size() == 0) {
     log.error("EVTL. PROGRAMM MIT OPTION -d <<Verzeichnis oder File>> STARTEN.")
 }
 
+
 originFileList.each { file ->
     log.info("start converting file: " + file.toPath())
     if (splitter == null || splitter == "" || splitter == 'auto' || !splitter.asBoolean()) {
@@ -147,58 +148,64 @@ originFileList.each { file ->
         log.info "using user defined splitter: " + splitter
     }
 
-    file.eachLine { line, count ->
-        def split = line.split(splitter.toString())
+    def uniqueDocumentId = xmlDataSuppliereShort + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
+    def outputFileName = uniqueDocumentId + "_" + xmlDataSuppliereShort + ".xml"
 
-        // check if header exists
-        if ((count == 1 && split[0].size() != 12) || count <= skipHeaderLines)   {
-            log.info "skipping automatic header line"
-            return
-        }
-        else {
-            log.info "Processing ISIN [" + split[0] + "]"
-        }
 
-        def includingAdditional = false
-        if (split.size() == 77) {
-            includingAdditional = true
-            log.info "csv includes EMT Additional data"
-        } else {
-            log.info "csv does not include EMT additional data"
-        }
+    log.debug("uniqueDocumentId: " + uniqueDocumentId)
+//    log.debug("reportingDate: " + reportingDate)
+    log.debug("outputFileName: " + outputFileName)
 
-        def uniqueDocumentId = xmlDataSuppliereShort + "-" + new Date().format('YYYY-MM-dd') + "-" + generator((('A'..'Z') + ('0'..'9')).join(), 9)
-        def reportingDate = split[4]
-        def outputFileName = split[0] + "_" + reportingDate + "_" + xmlDataSuppliereShort + ".xml"
 
-        log.debug("uniqueDocumentId: " + uniqueDocumentId)
-        log.debug("reportingDate: " + reportingDate)
-        log.debug("outputFileName: " + outputFileName)
 
-        def writer = new StringWriter()
-        def fXML = new MarkupBuilder(writer)
+    def writer = new StringWriter()
+    def fXML = new MarkupBuilder(writer)
 
-        fXML.FundsXML4(["xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation": schemaLocation]) {
-            ControlData {
-                UniqueDocumentID(uniqueDocumentId)
-                DocumentGenerated(DatatypeConverter.printDateTime(today))
-                Version("4.1.1")
-                ContentDate(reportingDate)
-                DataSupplier {
-                    SystemCountry(xmlSystemCountry)
-                    Short(xmlDataSuppliereShort)
-                    Name(xmlDataSuppliereName)
-                    Type(xmlDataSuppliereType)
-                }
-                CountrySpecificData {
-                    AT {
-                        FundDataPortalContent('REG')
-                    }
+    fXML.FundsXML4(["xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation": schemaLocation]) {
+        ControlData {
+            UniqueDocumentID(uniqueDocumentId)
+            DocumentGenerated(DatatypeConverter.printDateTime(today))
+            Version("4.1.1")
+            ContentDate(DatatypeConverter.printDate(today))
+            DataSupplier {
+                SystemCountry(xmlSystemCountry)
+                Short(xmlDataSuppliereShort)
+                Name(xmlDataSuppliereName)
+                Type(xmlDataSuppliereType)
+            }
+            DataOperation('INITIAL')
+            CountrySpecificData {
+                AT {
+                    FundDataPortalContent('REG')
                 }
             }
-            RegulatoryReportings {
-                DirectReporting {
-                    EMT {
+        }
+        RegulatoryReportings {
+            DirectReporting {
+                EMT {
+
+
+                    file.eachLine { line, count ->
+                        def split = line.split(splitter.toString())
+
+                        // check if header exists
+                        if ((count == 1 && split[0].size() != 12) || count <= skipHeaderLines) {
+                            log.info "skipping automatic header line"
+                            return
+                        } else {
+                            log.info "Processing ISIN [" + split[0] + "]"
+                        }
+
+                        def includingAdditional = false
+                        if (split.size() == 77) {
+                            includingAdditional = true
+                            log.info "csv includes EMT Additional data"
+                        } else {
+                            log.info "csv does not include EMT additional data"
+                        }
+
+                        def reportingDate = split[4]
+
                         FinancialInstrument {
                             FundOrShareClassIdentifiers {
                                 ISINs {
@@ -353,12 +360,14 @@ originFileList.each { file ->
                 }
             }
         }
-        log.debug XmlUtil.serialize(writer.toString())
 
-        new File(outputFileName).exists() ?: new File(outputFileName).delete()
-        new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
-        log.info "written: " + new File(outputFileName).size() + " bytes"
     }
+    log.debug XmlUtil.serialize(writer.toString())
+
+    new File(outputFileName).exists() ?: new File(outputFileName).delete()
+    new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
+    log.info "written: " + new File(outputFileName).size() + " bytes"
+
 }
 
 static String removeQuotes(String s) {
