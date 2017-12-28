@@ -4,6 +4,10 @@
 
 ## Purpose
 The following tool convertes a EMT (CSV file) to an FundsXML4 file.
+ 
+<b>All shareclasses (ISINs)of a fund has to be inside ONE csv file (grouping of XML data is done based on this information).</b>
+
+
 
 ## How to use
 
@@ -41,17 +45,16 @@ usage: java -jar FundsXML-EMT-Converter-0.1-all.jar
 ```
 
 
-
 ### output
-Valid FundsXML 4.1.0 files in current directory.
-One file per ISIN is created.  
-Filename: ```<ISIN>_<reportingDate>_<xmlDataSuppliereShort>.xml```
+Valid FundsXML 4.1.1 files in current directory.
+One file per Fund is created.  
+Filename: ```<<uniqueDocumentId>>_<<xmlDataSuppliereShort>>.xml```
 
 
 ### changelg
 2017-12-07: 
-* changed to FundsXML 4.1.1
+* changed to FundsXML 4.1.1 (2 nodes are now optional)
 * new schema location
 * header lines auto detect
 * supplierType - default changed to "KAG"
-
+* all shareclasses in one Fund node
