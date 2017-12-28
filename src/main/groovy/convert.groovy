@@ -320,7 +320,7 @@ originFileList.each { file ->
                                         !split[67] ?: DistributionFee(split[67].trim())
                                         TransactionCosts(split[68].trim())
                                         split[69].trim() ? IncidentialCosts(split[69].trim()) : IncidentialCosts(0)
-                                        if (split[70] != null && split[71] != null) {
+                                        if (split[70] != "" && split[71] != "") {
                                             CalculationPeriod {
                                                 !split[70] ?: Start(split[70].trim())
                                                 !split[71] ?: End(split[71].trim())
