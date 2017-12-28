@@ -320,7 +320,10 @@ originFileList.each { file ->
                                         !split[67] ?: DistributionFee(split[67].trim())
                                         TransactionCosts(split[68].trim())
                                         split[69].trim() ? IncidentialCosts(split[69].trim()) : IncidentialCosts(0)
-                                        if (split[70] != "" && split[71] != "") {
+
+                                        def calculationPeriod = (split[70] != "" && split[71] != "" && split[70] != null && split[71] != null)
+                                        log.debug "calulationPeriod: " + calculationPeriod
+                                        if (calculationPeriod) {
                                             CalculationPeriod {
                                                 !split[70] ?: Start(split[70].trim())
                                                 !split[71] ?: End(split[71].trim())
@@ -367,6 +370,7 @@ originFileList.each { file ->
     new File(outputFileName).exists() ?: new File(outputFileName).delete()
     new File(outputFileName).write(XmlUtil.serialize(writer.toString()))
     log.info "written: " + new File(outputFileName).size() + " bytes"
+    log.info "filename: " + outputFileName
 
 }
 
